@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>របាយការណ៍ស្ថិតិប្រជាជនខេត្តកោះកុង</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 p-5">
+    <div class="max-w-6xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+        <h1 class="text-2xl font-bold mb-6 text-blue-800">របាយការណ៍ផែនការយុទ្ធសាស្ត្រអភិវឌ្ឍន៍ឃុំ-សង្កាត់ (ខេត្តកោះកុង ២០២៥)</h1>
+        
+        <div id="report-content" class="space-y-8">
+            <!-- ផ្នែកតារាងប្រជាសាស្រ្តលម្អិត -->
+            <div class="p-4 border-l-4 border-green-500 bg-green-50">
+                <h2 class="text-xl font-semibold mb-4">១. តារាងស្ថិតិប្រជាជនលម្អិតតាមស្រុក</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-300 text-sm">
+                        <thead class="bg-blue-600 text-white">
+                            <tr>
+                                <th class="border px-2 py-2">ស្រុក/ក្រុង</th>
+                                <th class="border px-2 py-2">ប្រុស</th>
+                                <th class="border px-2 py-2">ស្រី</th>
+                                <th class="border px-2 py-2">សរុប</th>
+                            </tr>
+                        </thead>
+                        <tbody id="population-table-body"></tbody>
+                        <tfoot id="population-table-foot" class="bg-gray-200 font-bold"></tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ផ្នែកក្រាហ្វិក -->
+            <div class="p-4 border-l-4 border-blue-500 bg-blue-50">
+                <h2 class="text-xl font-semibold mb-4">២. ក្រាហ្វិកប្រៀបធៀបចំនួនប្រជាជន</h2>
+                <canvas id="demographicChart" class="w-full h-64"></canvas>
+            </div>
+        </div>
+
+        <div class="mt-8 flex gap-4">
+            <button onclick="window.print()" class="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700">បោះពុម្ព PDF</button>
+            <button onclick="generateWord()" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">ទាញយកជា MS-Word</button>
+        </div>
+    </div>
+
+    <script>
+        const data = {
+            districts: ['បុទុមសាគរ', 'គិរីសាគរ', 'កោះកុង', 'ខេមរភូមិន្ទ', 'មណ្ឌលសីមា', 'ស្រែអំបិល', 'ថ្មបាំង'],
+            popMale: [12531, 4421, 4843, 18578, 9419, 24051, 4664],
+            popFemale: [12043, 3967, 4552, 19926, 9587, 25293, 4481],
+            popTotal: [24574, 8388, 9395, 38504, 19006, 49344, 9145]
+        };
+
+        function initReport() {
+            // បំពេញតារាងប្រជាជន
+            const popTbody = document.getElementById('population-table-body');
+            const popTfoot = document.getElementById('population-table-foot');
+            popTbody.innerHTML = "";
+            
+            let totalMale = 0, totalFemale = 0, grandTotal = 0;
+
+            data.districts.forEach((d, i) => {
+                popTbody.innerHTML += `<tr>
+                    <td class="border px-4 py-2">${d}</td>
+                    <td class="border px-4 py-2 text-center">${data.popMale[i].toLocaleString()}</td>
+                    <td class="border px-4 py-2 text-center">${data.popFemale[i].toLocaleString()}</td>
+                    <td class="border px-4 py-2 text-center">${data.popTotal[i].toLocaleString()}</td>
+                </tr>`;
+                totalMale += data.popMale[i];
+                totalFemale += data.popFemale[i];
+                grandTotal += data.popTotal[i];
+            });
+
+            popTfoot.innerHTML = `<tr>
+                <td class="border px-4 py-2">សរុបសរុប</td>
+                <td class="border px-4 py-2 text-center">${totalMale.toLocaleString()}</td>
+                <td class="border px-4 py-2 text-center">${totalFemale.toLocaleString()}</td>
+                <td class="border px-4 py-2 text-center">${grandTotal.toLocaleString()}</td>
+            </tr>`;
+
+            // បង្កើតក្រាហ្វិក
+            const ctx = document.getElementById('demographicChart').getContext('2d');
+            if(window.myChart) window.myChart.destroy();
+            window.myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.districts,
+                    datasets: [{ label: 'ចំនួនប្រជាជនសរុប', data: data.popTotal, backgroundColor: '#3b82f6' }]
+                }
+            });
+        }
+
+        function generateWord() {
+            const content = document.getElementById('report-content').innerHTML;
+            const blob = new Blob(['\ufeff', '<html><head><meta charset="utf-8"></head><body>' + content + '</body></html>'], {type: 'application/msword'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'របាយការណ៍_ស្ថិតិប្រជាជន_កោះកុង.doc';
+            a.click();
+        }
+
+        window.onload = initReport;
+    </script>
+</body>
+</html>
