@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <title>របាយការណ៍ផែនការយុទ្ធសាស្រ្តអភិវឌ្ឍន៍ខេត្តកោះកុង ២០២៥</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50 p-8 font-sans text-gray-800">
+    <div class="max-w-6xl mx-auto bg-white p-10 shadow-2xl rounded-2xl border border-gray-100">
+        <header class="text-center mb-10 border-b pb-6">
+            <h1 class="text-3xl font-bold text-blue-900">របាយការណ៍ផែនការយុទ្ធសាស្រ្តអភិវឌ្ឍន៍ខេត្តកោះកុង</h1>
+            <p class="text-lg text-gray-600 mt-2">ឆ្នាំ ២០២៥ - ការវិភាគសូចនាករសរុបគ្រប់វិស័យតាមស្រុក</p>
+        </header>
+
+        <section class="mb-10">
+            <h2 class="text-xl font-bold text-blue-800 mb-4">តារាងសូចនាករសរុបតាមស្រុក</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs border-collapse border border-gray-200">
+                    <thead class="bg-blue-700 text-white">
+                        <tr>
+                            <th class="p-2 border">ស្រុក/ក្រុង</th>
+                            <th class="p-2 border">ប្រជាជនសរុប</th>
+                            <th class="p-2 border">មណ្ឌលសុខភាព</th>
+                            <th class="p-2 border">គ្រែសម្រាក</th>
+                            <th class="p-2 border">បុគ្គលិកសុខភាព</th>
+                            <th class="p-2 border">មេគ្រួសារជាស្ត្រី(%)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+            <div class="p-6 bg-blue-50 rounded-xl">
+                <h3 class="font-bold text-blue-900 mb-3">វិភាគទិន្នន័យរួម (Data Analysis)</h3>
+                <p class="text-sm leading-relaxed text-gray-700">
+                    ខេត្តកោះកុងមានប្រជាជនសរុប ១៥៨,៣៥៦នាក់។ ស្រុកស្រែអំបិលមានចំនួនប្រជាជនច្រើនជាងគេ (៤៩,៣៤៤នាក់) ដែលទាមទារការផ្តោតលើហេដ្ឋារចនាសម្ព័ន្ធ។ ស្រុកគិរីសាគរមានកម្រិតសេវាសុខាភិបាលទាប (មណ្ឌលសុខភាព ០) ដែលជាចំណុចគន្លឹះសម្រាប់ផែនការយុទ្ធសាស្រ្តឆ្នាំក្រោយ។
+                </p>
+            </div>
+            <div class="p-6 bg-green-50 rounded-xl">
+                <h3 class="font-bold text-green-900 mb-3">យេនឌ័រ និងកសិកម្ម</h3>
+                <p class="text-sm leading-relaxed text-gray-700">
+                    ស្រុកថ្មបាំង និងបុទុមសាគរ មានអត្រាស្ត្រីជាមេគ្រួសារខ្ពស់ ដែលតម្រូវឱ្យមានកម្មវិធីបណ្តុះបណ្តាលសហគ្រិនភាព និងកសិកម្មខ្នាតតូច ដើម្បីលើកកម្ពស់ជីវភាពគ្រួសារតាមសហគមន៍។
+                </p>
+            </div>
+        </section>
+
+        <section class="mb-10">
+            <h2 class="text-xl font-bold text-blue-800 mb-4">ក្រាហ្វិកបង្ហាញចំនួនប្រជាជន</h2>
+            <div class="h-64"><canvas id="barChart"></canvas></div>
+        </section>
+
+        <div class="text-center">
+            <button onclick="exportDoc()" class="bg-blue-900 text-white px-10 py-4 rounded-full font-bold hover:bg-blue-700 transition">ទាញយកឯកសារ MS-Word</button>
+        </div>
+    </div>
+
+    <script>
+        const data = [
+            {n: "បុទុមសាគរ", p: 24574, h: 3, bed: 24, med: 26, fem: 25.8},
+            {n: "គិរីសាគរ", p: 8388, h: 0, bed: 0, med: 0, fem: 16.4},
+            {n: "កោះកុង", p: 9395, h: 2, bed: 10, med: 20, fem: 20.8},
+            {n: "ខេមរភូមិន្ទ", p: 38504, h: 2, bed: 10, med: 18, fem: 13.4},
+            {n: "មណ្ឌលសីមា", p: 19006, h: 2, bed: 16, med: 14, fem: 14.5},
+            {n: "ស្រែអំបិល", p: 49344, h: 3, bed: 25, med: 21, fem: 17.5},
+            {n: "ថ្មបាំង", p: 9145, h: 2, bed: 15, med: 10, fem: 21.8}
+        ];
+
+        function render() {
+            const body = document.getElementById('data-body');
+            body.innerHTML = data.map(d => `<tr><td class="p-2 border font-bold">${d.n}</td><td class="p-2 border">${d.p.toLocaleString()}</td><td class="p-2 border">${d.h}</td><td class="p-2 border">${d.bed}</td><td class="p-2 border">${d.med}</td><td class="p-2 border">${d.fem}%</td></tr>`).join('');
+            
+            const ctx = document.getElementById('barChart').getContext('2d');
+            if (window.myChart) window.myChart.destroy();
+            window.myChart = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: data.map(d => d.n), datasets: [{ label: 'ចំនួនប្រជាជន', data: data.map(d => d.p), backgroundColor: '#1e40af' }] },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function exportDoc() {
+            const content = document.querySelector('.max-w-6xl').innerHTML;
+            const blob = new Blob(['\ufeff', content], {type: 'application/msword'});
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'របាយការណ៍_អភិវឌ្ឍន៍_ខេត្តកោះកុង_២០២៥.doc';
+            link.click();
+        }
+
+        render();
+    </script>
+</body>
+</html>
